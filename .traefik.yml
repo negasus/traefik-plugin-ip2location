@@ -1,0 +1,12 @@
+displayName: ip2location plugin
+type: middleware
+
+import: github.com/negasus/traefik-plugin-ip2location
+
+summary: '[ip2location] Add Geo Headers'
+
+testData:
+  FromHeader: ''
+  Filename: 'ip2location.bin'
+  Headers:
+    CountryShort: X-Country-Code
