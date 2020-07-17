@@ -236,7 +236,7 @@ func (d *DB) readuint8(pos int64) (uint8, error) {
 // read unsigned 32-bit integer from slices
 func (d *DB) readuint32_row(row []byte, pos uint32) uint32 {
 	var retval uint32
-	data := row[pos : pos+4]
+	data := row[int(pos) : int(pos)+4]
 	retval = binary.LittleEndian.Uint32(data)
 	return retval
 }
@@ -291,21 +291,21 @@ func (d *DB) readstr(pos uint32) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	retval = string(data[:strlen])
+	retval = string(data[:int(strlen)])
 	return retval, nil
 }
 
 // read float from slices
 func (d *DB) readfloat_row(row []byte, pos uint32) float32 {
 	var retval float32
-	data := row[pos : pos+4]
+	data := row[int(pos) : int(pos)+4]
 	bits := binary.LittleEndian.Uint32(data)
 	retval = math.Float32frombits(bits)
 	return retval
 }
 
 // read float
-func (d *DB) readfloat(pos uint32) (float32, error) {
+func (d *DB) readfloat(pos uint32) (float32, error) { // nolint:unused
 	pos2 := int64(pos)
 	var retval float32
 	data := make([]byte, 4)
@@ -886,9 +886,9 @@ func (d *DB) query(ipaddress string, mode uint32) (IP2Locationrecord, error) {
 	var mid uint32
 	var rowoffset uint32
 	var rowoffset2 uint32
-	ipfrom := big.NewInt(0)
-	ipto := big.NewInt(0)
-	maxip := big.NewInt(0)
+	ipfrom := big.NewInt(0) // nolint:staticcheck
+	ipto := big.NewInt(0)   // nolint:staticcheck
+	maxip := big.NewInt(0)  // nolint:staticcheck
 
 	if iptype == 4 {
 		baseaddr = d.meta.ipv4databaseaddr
