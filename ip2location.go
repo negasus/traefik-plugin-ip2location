@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+// Headers part of the configuration
 type Headers struct {
 	CountryShort       string `json:"country_short,omitempty"`
 	CountryLong        string `json:"country_long,omitempty"`
