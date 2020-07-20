@@ -30,6 +30,7 @@ http:
         ip2location:
           filename: /path/to/database.bin
           fromHeader: X-User-IP # optional
+          disableErrorHeader: false
           headers:
             CountryShort: X-GEO-CountryShort
             CountryLong: X-GEO-CountryLong
@@ -67,8 +68,18 @@ The path to ip2location database file (in binary format)
 
 If defined, IP address will be obtained from this HTTP header
 
+#### DisableErrorHeader (`disableErrorHeader`)
+
+*Default: false*
+
+If `false`, any errors will be placed to the `X-IP2LOCATION-ERROR` http header. Set to `true` for disable. 
+
 #### Headers (`headers`)
 
 *Default: empty*
 
 Define the HTTP Header name if you want to pass any of the parameters
+
+### Errors
+
+If any error occurred, this error will be placed to X-IP2LOCATION-ERROR header

@@ -34,9 +34,10 @@ type Headers struct {
 
 // Config the plugin configuration.
 type Config struct {
-	Filename   string  `json:"filename,omitempty"`
-	FromHeader string  `json:"from_header,omitempty"`
-	Headers    Headers `json:"headers,omitempty"`
+	Filename           string  `json:"filename,omitempty"`
+	FromHeader         string  `json:"from_header,omitempty"`
+	Headers            Headers `json:"headers,omitempty"`
+	DisableErrorHeader bool    `json:"disable_error_header,omitempty"`
 }
 
 // CreateConfig creates the default plugin configuration.
@@ -46,11 +47,12 @@ func CreateConfig() *Config {
 
 // IP2Location plugin.
 type IP2Location struct {
-	next       http.Handler
-	name       string
-	fromHeader string
-	db         *DB
-	headers    Headers
+	next               http.Handler
+	name               string
+	fromHeader         string
+	db                 *DB
+	headers            Headers
+	disableErrorHeader bool
 }
 
 // New created a new IP2Location plugin.
@@ -61,24 +63,29 @@ func New(_ context.Context, next http.Handler, config *Config, name string) (htt
 	}
 
 	return &IP2Location{
-		next:       next,
-		name:       name,
-		fromHeader: config.FromHeader,
-		db:         db,
-		headers:    config.Headers,
+		next:               next,
+		name:               name,
+		fromHeader:         config.FromHeader,
+		db:                 db,
+		headers:            config.Headers,
+		disableErrorHeader: config.DisableErrorHeader,
 	}, nil
 }
 
 func (a *IP2Location) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 	ip, err := a.getIP(req)
 	if err != nil {
-		req.Header.Add("X-IP2LOCATION-ERROR", err.Error())
+		if !a.disableErrorHeader {
+			req.Header.Add("X-IP2LOCATION-ERROR", err.Error())
+		}
 		a.next.ServeHTTP(rw, req)
 	}
 
 	record, err := a.db.Get_all(ip.String())
 	if err != nil {
-		req.Header.Add("X-IP2LOCATION-ERROR", err.Error())
+		if !a.disableErrorHeader {
+			req.Header.Add("X-IP2LOCATION-ERROR", err.Error())
+		}
 		a.next.ServeHTTP(rw, req)
 	}
 
