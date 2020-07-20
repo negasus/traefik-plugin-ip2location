@@ -95,13 +95,11 @@ func (a *IP2Location) ServeHTTP(rw http.ResponseWriter, req *http.Request) {
 }
 
 func (a *IP2Location) getIP(req *http.Request) (net.IP, error) {
-	remoteAddr := req.RemoteAddr
-
 	if a.fromHeader != "" {
-		remoteAddr = req.Header.Get(a.fromHeader)
+		return net.ParseIP(req.Header.Get(a.fromHeader)), nil
 	}
 
-	addr, _, err := net.SplitHostPort(remoteAddr)
+	addr, _, err := net.SplitHostPort(req.RemoteAddr)
 	if err != nil {
 		return nil, err
 	}
